@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa Conceptual - Método Formal Causal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mapa_conceptual.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="mapa-body">
+    <!-- Barra de navegación -->
+    <nav class="mapa-nav">
+        <div class="container">
+            <div class="nav-content">
+                <h1 class="nav-title">Mapa Conceptual - Método Formal Causal</h1>
+                <div class="nav-buttons">
+                    <a href="/informe/{{ informe_id }}" class="btn btn-secondary btn-small">Ver Informe Completo</a>
+                    <a href="/" class="btn btn-secondary btn-small">Inicio</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenedor principal -->
+    <div class="mapa-container">
+        <div class="container">
+            <!-- Introducción -->
+            <div class="mapa-intro">
+                <h2>Análisis Visual del Método Formal Causal</h2>
+                <p>Explore la estructura de motivaciones y objetivos que fundamentan este informe pericial. Haga clic en cada elemento para ver más detalles.</p>
+            </div>
+
+            <!-- Conjetura central -->
+            <div class="conjetura-central">
+                <div class="nodo-central">
+                    <div class="nodo-icono">
+                        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="50" cy="50" r="45" stroke="currentColor" stroke-width="3" fill="none"/>
+                            <circle cx="50" cy="50" r="8" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <h3>Conjetura Inicial</h3>
+                    <p class="conjetura-texto">{{ informe.conjetura }}</p>
+                </div>
+            </div>
+
+            <!-- Sección: ¿POR QUÉ? -->
+            <div class="mapa-seccion">
+                <h2 class="seccion-titulo">¿POR QUÉ? - Motivaciones</h2>
+                <div class="nodos-grid">
+                    <!-- Motivaciones Preceptivas -->
+                    <div class="nodo-card preceptivas" data-tipo="preceptivas">
+                        <div class="nodo-header">
+                            <div class="nodo-icono-small">
+                                <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="10" y="10" width="30" height="30" stroke="currentColor" stroke-width="2" fill="none"/>
+                                    <line x1="15" y1="20" x2="35" y2="20" stroke="currentColor" stroke-width="2"/>
+                                    <line x1="15" y1="25" x2="35" y2="25" stroke="currentColor" stroke-width="2"/>
+                                    <line x1="15" y1="30" x2="25" y2="30" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                            </div>
+                            <h3>Preceptivas</h3>
+                        </div>
+                        <p class="nodo-descripcion">Del enunciado del problema</p>
+                        <div class="nodo-contenido">
+                            {% for motivacion in informe.analisis.por_que.preceptivas %}
+                            <div class="motivacion-item">
+                                <h4>{{ motivacion.titulo }}</h4>
+                                <p>{{ motivacion.contenido }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <button class="btn-expandir" onclick="toggleNodo(this)">Ver más</button>
+                    </div>
+
+                    <!-- Motivaciones Técnicas -->
+                    <div class="nodo-card tecnicas" data-tipo="tecnicas">
+                        <div class="nodo-header">
+                            <div class="nodo-icono-small">
+                                <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M25 5 L45 45 L5 45 Z" stroke="currentColor" stroke-width="2" fill="none"/>
+                                    <line x1="25" y1="30" x2="25" y2="35" stroke="currentColor" stroke-width="3"/>
+                                </svg>
+                            </div>
+                            <h3>Técnicas</h3>
+                        </div>
+                        <p class="nodo-descripcion">Leyes y normativas implícitas</p>
+                        <div class="nodo-contenido">
+                            {% for motivacion in informe.analisis.por_que.tecnicas %}
+                            <div class="motivacion-item">
+                                <h4>{{ motivacion.titulo }}</h4>
+                                <p>{{ motivacion.contenido }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <button class="btn-expandir" onclick="toggleNodo(this)">Ver más</button>
+                    </div>
+
+                    <!-- Motivaciones Facultativas -->
+                    <div class="nodo-card facultativas" data-tipo="facultativas">
+                        <div class="nodo-header">
+                            <div class="nodo-icono-small">
+                                <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="25" cy="25" r="15" stroke="currentColor" stroke-width="2" fill="none"/>
+                                    <path d="M25 15 L25 25 L32 32" stroke="currentColor" stroke-width="2" fill="none"/>
+                                </svg>
+                            </div>
+                            <h3>Facultativas</h3>
+                        </div>
+                        <p class="nodo-descripcion">Motivación profesional</p>
+                        <div class="nodo-contenido">
+                            {% for motivacion in informe.analisis.por_que.facultativas %}
+                            <div class="motivacion-item">
+                                <h4>{{ motivacion.titulo }}</h4>
+                                <p>{{ motivacion.contenido }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <button class="btn-expandir" onclick="toggleNodo(this)">Ver más</button>
+                    </div>
+
+                    <!-- Motivaciones Progresistas -->
+                    <div class="nodo-card progresistas" data-tipo="progresistas">
+                        <div class="nodo-header">
+                            <div class="nodo-icono-small">
+                                <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M10 35 L25 10 L40 35" stroke="currentColor" stroke-width="2" fill="none"/>
+                                    <line x1="15" y1="30" x2="35" y2="30" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                            </div>
+                            <h3>Progresistas</h3>
+                        </div>
+                        <p class="nodo-descripcion">Aportación al conocimiento</p>
+                        <div class="nodo-contenido">
+                            {% for motivacion in informe.analisis.por_que.progresistas %}
+                            <div class="motivacion-item">
+                                <h4>{{ motivacion.titulo }}</h4>
+                                <p>{{ motivacion.contenido }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <button class="btn-expandir" onclick="toggleNodo(this)">Ver más</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Conectores visuales -->
+            <div class="conector-visual">
+                <svg class="linea-conexion" viewBox="0 0 100 50" preserveAspectRatio="none">
+                    <line x1="50" y1="0" x2="50" y2="50" stroke="#3949ab" stroke-width="2" stroke-dasharray="5,5"/>
+                </svg>
+            </div>
+
+            <!-- Sección: ¿PARA QUÉ? -->
+            <div class="mapa-seccion">
+                <h2 class="seccion-titulo">¿PARA QUÉ? - Objetivos y Finalidades</h2>
+                <div class="nodo-grande para-que">
+                    <div class="nodo-header">
+                        <div class="nodo-icono-medium">
+                            <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="25" cy="25" r="20" stroke="currentColor" stroke-width="2" fill="none"/>
+                                <path d="M25 10 L25 25 L35 25" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="38" cy="12" r="3" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <h3>Objetivos del Análisis</h3>
+                    </div>
+                    <div class="nodo-contenido expandido">
+                        <div class="objetivos-grid">
+                            {% for objetivo in informe.analisis.para_que %}
+                            <div class="objetivo-card" data-tipo="{{ objetivo.tipo }}">
+                                <div class="objetivo-header">
+                                    <span class="objetivo-badge badge-{{ objetivo.tipo }}">
+                                        {% if objetivo.tipo == 'preceptivas' %}📋
+                                        {% elif objetivo.tipo == 'tecnicas' %}⚙️
+                                        {% elif objetivo.tipo == 'facultativas' %}👤
+                                        {% else %}🚀{% endif %}
+                                    </span>
+                                    <h4>{{ objetivo.titulo }}</h4>
+                                </div>
+                                <p>{{ objetivo.contenido }}</p>
+                                <span class="objetivo-tipo-label">{{ objetivo.tipo | capitalize }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Conectores visuales -->
+            <div class="conector-visual">
+                <svg class="linea-conexion" viewBox="0 0 100 50" preserveAspectRatio="none">
+                    <line x1="50" y1="0" x2="50" y2="50" stroke="#3949ab" stroke-width="2" stroke-dasharray="5,5"/>
+                </svg>
+            </div>
+
+            <!-- Sección: ¿QUÉ ES? -->
+            <div class="mapa-seccion">
+                <h2 class="seccion-titulo">¿QUÉ ES? - Definición y Contextualización</h2>
+                <div class="nodo-grande que-es">
+                    <div class="nodo-header">
+                        <div class="nodo-icono-medium">
+                            <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="10" y="10" width="30" height="30" stroke="currentColor" stroke-width="2" fill="none" rx="5"/>
+                                <circle cx="25" cy="25" r="8" stroke="currentColor" stroke-width="2" fill="none"/>
+                            </svg>
+                        </div>
+                        <h3>Definición del Problema</h3>
+                    </div>
+                    <div class="nodo-contenido expandido">
+                        <p class="que-es-texto">{{ informe.analisis.que_es.contenido }}</p>
+                        
+                        <div class="contexto-wrapper">
+                            <h4>Contextualización:</h4>
+                            <p>{{ informe.analisis.que_es.contexto }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumen de navegación -->
+            <div class="mapa-resumen">
+                <h3>Resumen de la Estructura</h3>
+                <div class="resumen-stats">
+                    <div class="stat-item">
+                        <span class="stat-numero">4</span>
+                        <span class="stat-label">Tipos de Motivaciones</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-numero">{{ informe.analisis.para_que|length }}</span>
+                        <span class="stat-label">Objetivos Establecidos</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-numero">3</span>
+                        <span class="stat-label">Fases del Método</span>
+                    </div>
+                </div>
+                <p class="resumen-texto">
+                    Este mapa conceptual representa la estructura lógica del análisis pericial siguiendo el Método Formal Causal.
+                    Cada motivación identificada se relaciona con objetivos específicos que conducen a una definición precisa del problema.
+                </p>
+            </div>
+
+            <!-- Acciones finales -->
+            <div class="mapa-acciones">
+                <a href="/informe/{{ informe_id }}" class="btn btn-primary">Ver Informe Completo</a>
+                <button onclick="window.print()" class="btn btn-secondary">Imprimir Mapa</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/mapa_conceptual.js') }}"></script>
+</body>
+</html>

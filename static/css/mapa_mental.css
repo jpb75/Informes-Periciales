@@ -1,0 +1,568 @@
+/* ========================================
+   MAPA CONCEPTUAL INTERACTIVO - ESTILO MAPA MENTAL
+   ======================================== */
+
+:root {
+    --color-preceptivas: #1976d2;
+    --color-tecnicas: #f57c00;
+    --color-facultativas: #388e3c;
+    --color-progresistas: #7b1fa2;
+    --node-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    --node-shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.20);
+}
+
+.mapa-body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+/* Navegación */
+.mapa-nav {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.nav-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.nav-title {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    color: var(--color-primary);
+    margin: 0;
+}
+
+.nav-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+/* Controles del mapa */
+.mapa-controles {
+    position: fixed;
+    top: 100px;
+    right: 2rem;
+    z-index: 900;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 0.75rem;
+    border-radius: 15px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.btn-control {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.btn-control:hover {
+    transform: scale(1.1);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-control svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Canvas del mapa */
+.mapa-canvas {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 80px);
+    overflow: hidden;
+    cursor: grab;
+}
+
+.mapa-canvas:active {
+    cursor: grabbing;
+}
+
+.conexiones-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.nodos-contenedor {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    width: 200%;
+    height: 200%;
+    transition: transform 0.3s ease;
+    z-index: 2;
+}
+
+/* Nodos base */
+.nodo {
+    position: absolute;
+    background: white;
+    border-radius: 15px;
+    box-shadow: var(--node-shadow);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    cursor: pointer;
+    animation: nodoAppear 0.6s ease-out;
+    padding: 20px;
+}
+
+@keyframes nodoAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.nodo:hover {
+    box-shadow: var(--node-shadow-hover);
+    transform: translateY(-5px) scale(1.02);
+    z-index: 100;
+}
+
+.nodo-inner {
+    padding: 1.5rem;
+}
+
+/* Nodo raíz (conjetura) */
+.nodo-raiz {
+    top: 5%;
+    left: 50%;
+    transform: translate(-50%, 0);
+    width: 400px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    z-index: 10;
+    box-shadow: 0 15px 60px rgba(102, 126, 234, 0.4);
+}
+
+.nodo-raiz .nodo-icono {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1rem;
+    color: white;
+}
+
+.nodo-raiz h3 {
+    text-align: center;
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.nodo-raiz .nodo-texto {
+    text-align: center;
+    line-height: 1.5;
+    font-size: 1rem;
+    opacity: 0.95;
+}
+
+/* Nodos de motivaciones (nivel 1) */
+.nodo-motivacion {
+    width: 260px;
+    border-top: 5px solid;
+}
+
+.nodo-motivacion.preceptivas {
+    border-color: var(--color-preceptivas);
+}
+
+.nodo-motivacion.tecnicas {
+    border-color: var(--color-tecnicas);
+}
+
+.nodo-motivacion.facultativas {
+    border-color: var(--color-facultativas);
+}
+
+.nodo-motivacion.progresistas {
+    border-color: var(--color-progresistas);
+}
+
+.nodo-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.nodo-icono-small {
+    font-size: 1.8rem;
+}
+
+.nodo-header h4 {
+    flex: 1;
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--color-primary);
+}
+
+.toggle-icon {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-light);
+    border-radius: 50%;
+    font-weight: bold;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.nodo.expandido .toggle-icon {
+    transform: rotate(45deg);
+    background: var(--color-primary);
+    color: white;
+}
+
+.nodo-desc {
+    color: var(--color-text-light);
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+.nodo-detalles {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: all 0.4s ease;
+    margin-top: 0.75rem;
+}
+
+.nodo.expandido .nodo-detalles {
+    max-height: 600px;
+    opacity: 1;
+}
+
+.detalle-item {
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--color-light);
+}
+
+.detalle-item:last-child {
+    border-bottom: none;
+}
+
+.detalle-item strong {
+    display: block;
+    color: var(--color-primary);
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.detalle-item p {
+    margin: 0;
+    line-height: 1.6;
+    color: var(--color-text);
+    font-size: 0.9rem;
+}
+
+/* Nodos de objetivos (nivel 2) */
+.nodo-objetivo {
+    width: 230px;
+    border-left: 4px solid;
+}
+
+.nodo-objetivo.preceptivas {
+    border-color: var(--color-preceptivas);
+}
+
+.nodo-objetivo.tecnicas {
+    border-color: var(--color-tecnicas);
+}
+
+.nodo-objetivo.facultativas {
+    border-color: var(--color-facultativas);
+}
+
+.nodo-objetivo.progresistas {
+    border-color: var(--color-progresistas);
+}
+
+/* Posicionamiento jerárquico de motivaciones (nivel 1) */
+.nodo-motivacion:nth-of-type(2) { top: 25%; left: 8%; }   /* Preceptivas */
+.nodo-motivacion:nth-of-type(3) { top: 25%; left: 31%; }  /* Técnicas */
+.nodo-motivacion:nth-of-type(4) { top: 25%; right: 31%; } /* Facultativas */
+.nodo-motivacion:nth-of-type(5) { top: 25%; right: 8%; }  /* Progresistas */
+
+/* Posicionamiento jerárquico de objetivos (nivel 2) */
+/* Bajo Preceptivas */
+.nodo-objetivo:nth-of-type(6) { top: 55%; left: 4%; }
+.nodo-objetivo:nth-of-type(7) { top: 55%; left: 16%; }
+
+/* Bajo Técnicas */
+.nodo-objetivo:nth-of-type(8) { top: 55%; left: 28%; }
+.nodo-objetivo:nth-of-type(9) { top: 55%; left: 40%; }
+
+/* Bajo Facultativas */
+.nodo-objetivo:nth-of-type(10) { top: 55%; right: 40%; }
+.nodo-objetivo:nth-of-type(11) { top: 55%; right: 28%; }
+
+/* Bajo Progresistas */
+.nodo-objetivo:nth-of-type(12) { top: 55%; right: 16%; }
+.nodo-objetivo:nth-of-type(13) { top: 55%; right: 4%; }
+
+.nodo-objetivo .nodo-header {
+    margin-bottom: 0;
+}
+
+.nodo-objetivo h5 {
+    font-size: 1rem;
+    margin: 0;
+    color: var(--color-primary);
+    flex: 1;
+}
+
+.nodo-badge {
+    font-size: 1.1rem;
+}
+
+/* Nodo definición (separado, abajo) */
+.nodo-definicion {
+    width: 400px;
+    bottom: 5%;
+    left: 50%;
+    transform: translate(-50%, 0);
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    border: none;
+}
+
+.nodo-definicion .nodo-header h4,
+.nodo-definicion .nodo-desc {
+    color: white;
+}
+
+.nodo-definicion .toggle-icon {
+    background: rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+.nodo-definicion.expandido .toggle-icon {
+    background: white;
+    color: #f5576c;
+}
+
+.nodo-definicion .detalle-item strong {
+    color: white;
+}
+
+.nodo-definicion .detalle-item p {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+/* Líneas de conexión */
+.linea-conexion {
+    stroke-width: 3;
+    stroke-linecap: round;
+    fill: none;
+    opacity: 0.6;
+    transition: all 0.3s ease;
+    animation: lineGrow 1s ease-out;
+}
+
+@keyframes lineGrow {
+    from {
+        stroke-dashoffset: 1000;
+    }
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+.linea-conexion:hover {
+    opacity: 1;
+    stroke-width: 4;
+}
+
+/* Leyenda */
+.mapa-leyenda {
+    position: fixed;
+    bottom: 2rem;
+    left: 2rem;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 1rem 1.5rem;
+    border-radius: 15px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    z-index: 900;
+}
+
+.mapa-leyenda h4 {
+    margin: 0 0 0.75rem 0;
+    font-size: 1rem;
+    color: var(--color-primary);
+}
+
+.leyenda-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.color-box {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+}
+
+.color-box.preceptivas { background: var(--color-preceptivas); }
+.color-box.tecnicas { background: var(--color-tecnicas); }
+.color-box.facultativas { background: var(--color-facultativas); }
+.color-box.progresistas { background: var(--color-progresistas); }
+
+/* Ayuda */
+.mapa-ayuda {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 900;
+}
+
+.btn-ayuda {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
+    transition: all 0.3s ease;
+}
+
+.btn-ayuda:hover {
+    transform: scale(1.1) rotate(15deg);
+}
+
+.ayuda-panel {
+    position: absolute;
+    bottom: 60px;
+    right: 0;
+    width: 300px;
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+.ayuda-panel.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+}
+
+.ayuda-panel h4 {
+    margin: 0 0 1rem 0;
+    color: var(--color-primary);
+}
+
+.ayuda-panel ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.ayuda-panel li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--color-light);
+    font-size: 0.9rem;
+}
+
+.ayuda-panel li:last-child {
+    border-bottom: none;
+}
+
+.ayuda-panel strong {
+    color: var(--color-primary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .nodo-raiz {
+        width: 280px;
+    }
+    
+    .nodo-motivacion {
+        width: 220px;
+    }
+    
+    .nodo-objetivo {
+        width: 200px;
+    }
+    
+    .mapa-controles {
+        right: 1rem;
+        top: 80px;
+        scale: 0.9;
+    }
+    
+    .mapa-leyenda {
+        bottom: 1rem;
+        left: 1rem;
+        scale: 0.9;
+    }
+    
+    .mapa-ayuda {
+        bottom: 1rem;
+        right: 1rem;
+    }
+}
+
+/* Animaciones adicionales */
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 0 20px rgba(102, 126, 234, 0);
+    }
+}
+
+.nodo-raiz {
+    animation: nodoAppear 0.6s ease-out, pulse 3s infinite;
+}
+
+/* Modo zoom */
+.mapa-canvas.zoom-mode .nodos-contenedor {
+    will-change: transform;
+}

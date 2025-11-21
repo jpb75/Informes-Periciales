@@ -1,0 +1,651 @@
+/* ========================================
+   ESTILOS ESPECÍFICOS PARA EL INFORME PERICIAL
+   ======================================== */
+
+/* Variables adicionales para el informe */
+:root {
+    --color-badge-manual: #1565c0;
+    --color-badge-auto: #ef6c00;
+    --color-badge-ia: #2e7d32;
+    --color-critical: #c62828;
+}
+
+/* Reset para impresión */
+@page {
+    size: A4;
+    margin: 2cm;
+}
+
+/* Body del informe */
+.informe-body {
+    background-color: #f5f5f5;
+    padding: 0;
+    margin: 0;
+}
+
+/* Barra de acciones (no se imprime) */
+.informe-actions {
+    background: var(--color-white);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    margin-bottom: 2rem;
+}
+
+.informe-actions .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-small {
+    padding: 0.6rem 1.5rem;
+    font-size: 0.95rem;
+}
+
+/* Contenedor principal del informe */
+.informe-container {
+    max-width: 21cm;
+    margin: 0 auto 3rem;
+    background: var(--color-white);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+    min-height: 29.7cm;
+}
+
+.informe-seccion {
+    padding: 2.5rem 3rem;
+}
+
+/* Portada */
+.informe-portada {
+    min-height: 29.7cm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    color: var(--color-white);
+    text-align: center;
+    padding: 3rem;
+}
+
+.portada-content {
+    width: 100%;
+}
+
+.portada-logo {
+    margin-bottom: 3rem;
+}
+
+.portada-logo .logo-icon {
+    width: 150px;
+    height: 150px;
+    color: var(--color-white);
+    filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
+}
+
+.portada-titulo {
+    font-family: var(--font-heading);
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin: 2rem 0 3rem;
+    letter-spacing: 2px;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.portada-info {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.info-item {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+}
+
+.info-item strong {
+    display: block;
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+    opacity: 0.9;
+}
+
+.info-item p {
+    font-size: 1.2rem;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Títulos de sección */
+.seccion-titulo {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    color: var(--color-primary);
+    border-bottom: 3px solid var(--color-primary);
+    padding-bottom: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+/* Badges de identificación - REMOVIDOS para informe profesional */
+.badge-manual::before,
+.badge-auto::before,
+.badge-ia::before {
+    content: '';
+    margin-right: 0;
+}
+
+.badge-auto::before {
+    content: '';
+}
+
+.badge-ia::before {
+    content: '';
+}
+
+/* Índice */
+.indice {
+    margin-top: 2rem;
+}
+
+.indice-item {
+    display: flex;
+    align-items: baseline;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid var(--color-light);
+}
+
+.indice-titulo {
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.indice-puntos {
+    flex: 1;
+    border-bottom: 2px dotted var(--color-text-light);
+    margin: 0 1rem;
+    opacity: 0.5;
+}
+
+.indice-pagina {
+    font-weight: 700;
+    color: var(--color-primary);
+    min-width: 30px;
+    text-align: right;
+}
+
+/* Tablas de datos */
+.datos-tabla {
+    margin: 1.5rem 0;
+}
+
+.dato-row {
+    display: flex;
+    padding: 1rem;
+    border-bottom: 1px solid var(--color-light);
+    align-items: baseline;
+}
+
+.dato-row:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.dato-row strong {
+    min-width: 250px;
+    color: var(--color-primary);
+    font-weight: 600;
+}
+
+.dato-row span {
+    flex: 1;
+    color: var(--color-text);
+}
+
+/* Subsecciones */
+.subseccion {
+    margin: 2rem 0;
+}
+
+.subseccion h3 {
+    font-size: 1.3rem;
+    color: var(--color-secondary);
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.subseccion h4 {
+    font-size: 1.1rem;
+    color: var(--color-accent);
+    margin: 1rem 0 0.5rem;
+    font-weight: 600;
+}
+
+.subseccion p {
+    text-align: justify;
+    line-height: 1.8;
+    color: var(--color-text);
+    margin-bottom: 1rem;
+}
+
+.subseccion ul,
+.subseccion ol {
+    margin-left: 2rem;
+    line-height: 1.8;
+}
+
+.subseccion li {
+    margin: 0.5rem 0;
+    color: var(--color-text);
+}
+
+/* Juramento */
+.juramento {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: var(--color-light);
+    border-left: 4px solid var(--color-primary);
+    border-radius: 5px;
+}
+
+.juramento h3 {
+    font-size: 1.2rem;
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+}
+
+.juramento p {
+    font-style: italic;
+    line-height: 1.8;
+}
+
+/* Conjetura destacada */
+.conjetura-texto {
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+    border-left: 5px solid var(--color-accent);
+    border-radius: 5px;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    font-style: italic;
+    color: var(--color-text);
+}
+
+/* Caja de metodología */
+.metodologia-box {
+    padding: 1.5rem;
+    background: var(--color-light);
+    border-radius: 10px;
+    margin: 1.5rem 0;
+}
+
+.metodologia-box h3 {
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+}
+
+.metodologia-box p {
+    line-height: 1.8;
+}
+
+/* Análisis Formal Causal */
+.metodologia-formal-causal {
+    margin-top: 2rem;
+}
+
+.fase-analisis {
+    margin: 2rem 0;
+    padding: 2rem;
+    background: #fafafa;
+    border-radius: 10px;
+    border-left: 5px solid var(--color-primary);
+}
+
+.fase-titulo {
+    font-size: 1.5rem;
+    color: var(--color-primary);
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+}
+
+.motivacion-tipo {
+    margin: 1.5rem 0;
+    padding: 1.5rem;
+    background: var(--color-white);
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.motivacion-tipo h4 {
+    color: var(--color-secondary);
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.motivacion-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-light);
+    font-style: italic;
+    margin-bottom: 1rem;
+}
+
+.motivacion-contenido {
+    text-align: justify;
+    line-height: 1.8;
+    color: var(--color-text);
+}
+
+/* Para qué */
+.para-que-contenido,
+.que-es-contenido {
+    padding: 1.5rem;
+    background: var(--color-white);
+    border-radius: 8px;
+    text-align: justify;
+    line-height: 1.8;
+}
+
+.relaciones-motivaciones {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: var(--color-white);
+    border-radius: 8px;
+}
+
+.relaciones-motivaciones h4 {
+    color: var(--color-accent);
+    margin-bottom: 1rem;
+}
+
+.relaciones-motivaciones ul {
+    margin-left: 2rem;
+}
+
+.relaciones-motivaciones li {
+    margin: 0.8rem 0;
+    line-height: 1.6;
+}
+
+/* Notas críticas */
+.critical-review {
+    border-left-color: var(--color-critical);
+}
+
+.critical-note {
+    background: #fff3e0;
+    border: 2px solid var(--color-critical);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    color: var(--color-critical);
+    font-weight: 600;
+}
+
+.resultados-tecnicos {
+    padding: 1.5rem;
+    background: var(--color-white);
+    border: 2px dashed var(--color-critical);
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+/* Conclusiones */
+.conclusiones-contenido {
+    margin-top: 1.5rem;
+}
+
+.conclusiones-lista {
+    margin-left: 2rem;
+    counter-reset: item;
+}
+
+.conclusiones-lista li {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: var(--color-white);
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    line-height: 1.8;
+    text-align: justify;
+}
+
+.opinion-tecnica {
+    padding: 1.5rem;
+    background: #fff3e0;
+    border: 2px solid var(--color-badge-auto);
+    border-radius: 8px;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    text-align: justify;
+    font-weight: 500;
+}
+
+/* Anexos */
+.anexos-lista {
+    margin: 1.5rem 0;
+}
+
+.anexo-item {
+    padding: 1rem;
+    margin: 0.5rem 0;
+    background: var(--color-white);
+    border-left: 4px solid var(--color-badge-auto);
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.anexo-numero {
+    font-weight: 700;
+    color: var(--color-primary);
+    min-width: 100px;
+}
+
+.anexo-descripcion {
+    flex: 1;
+    color: var(--color-text);
+}
+
+.nota-anexos {
+    margin-top: 2rem;
+    padding: 1rem;
+    background: var(--color-light);
+    border-radius: 5px;
+    text-align: center;
+    font-style: italic;
+}
+
+/* Firma */
+.firma-contenedor {
+    margin-top: 3rem;
+}
+
+.firma-lugar-fecha {
+    margin-bottom: 3rem;
+}
+
+.firma-lugar-fecha p {
+    font-size: 1.1rem;
+    margin: 0.5rem 0;
+}
+
+.firma-espacio {
+    text-align: center;
+    margin: 4rem 0 2rem;
+}
+
+.firma-linea {
+    width: 300px;
+    height: 100px;
+    margin: 0 auto 1rem;
+    border-bottom: 2px solid var(--color-text);
+}
+
+.firma-nombre {
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin: 0.5rem 0;
+}
+
+.firma-titulo,
+.firma-colegiado {
+    color: var(--color-text-light);
+    margin: 0.3rem 0;
+}
+
+.firma-sello {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.sello-placeholder {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto;
+    border: 3px dashed var(--color-text-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-light);
+    font-style: italic;
+}
+
+/* Leyenda de colores */
+.leyenda-colores {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--color-white);
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    max-width: 300px;
+    z-index: 999;
+}
+
+.leyenda-colores h4 {
+    margin: 0 0 1rem 0;
+    font-size: 1rem;
+    color: var(--color-primary);
+}
+
+.leyenda-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.leyenda-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.badge-manual-mini,
+.badge-auto-mini,
+.badge-ia-mini {
+    font-size: 1.2rem;
+}
+
+/* Saltos de página para impresión */
+.page-break {
+    page-break-after: always;
+}
+
+/* Estilos de impresión */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    .informe-body {
+        background: var(--color-white);
+    }
+    
+    .informe-container {
+        max-width: 100%;
+        box-shadow: none;
+        margin: 0;
+    }
+    
+    .informe-seccion {
+        padding: 1.5cm;
+    }
+    
+    .page-break {
+        page-break-after: always;
+    }
+    
+    .critical-note {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    /* Asegurar que los colores se impriman */
+    .portada-titulo::before,
+    .badge-manual::before,
+    .badge-auto::before,
+    .badge-ia::before {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .informe-container {
+        max-width: 100%;
+        margin: 0;
+        box-shadow: none;
+    }
+    
+    .informe-seccion {
+        padding: 1.5rem;
+    }
+    
+    .portada-titulo {
+        font-size: 2.5rem;
+    }
+    
+    .seccion-titulo {
+        font-size: 1.5rem;
+    }
+    
+    .dato-row {
+        flex-direction: column;
+    }
+    
+    .dato-row strong {
+        min-width: auto;
+        margin-bottom: 0.5rem;
+    }
+    
+    .leyenda-colores {
+        position: static;
+        margin: 2rem 1rem;
+        max-width: 100%;
+    }
+    
+    .informe-actions .container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .action-buttons {
+        width: 100%;
+        flex-direction: column;
+    }
+    
+    .btn-small {
+        width: 100%;
+    }
+}

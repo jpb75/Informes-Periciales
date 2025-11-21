@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Informes Periciales - Método Formal Causal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero parallax-section" id="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="logo-container zoom-on-scroll">
+                <svg class="logo-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="45" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <path d="M30 50 L45 35 L70 60" stroke="currentColor" stroke-width="3" fill="none"/>
+                    <circle cx="50" cy="50" r="8" fill="currentColor"/>
+                </svg>
+            </div>
+            <h1 class="main-title fade-in-up">Sistema de Informes Periciales</h1>
+            <p class="subtitle fade-in-up delay-1">Redacción Motivada mediante Método Formal Causal</p>
+            <div class="scroll-indicator fade-in-up delay-2">
+                <div class="mouse">
+                    <div class="wheel"></div>
+                </div>
+                <p>Desliza para comenzar</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Método Section -->
+    <section class="method-section" id="metodo">
+        <div class="container">
+            <h2 class="section-title zoom-on-scroll">El Método Formal Causal</h2>
+            <p class="section-description">Un enfoque estructurado para la redacción de informes fundamentados</p>
+            
+            <div class="method-grid">
+                <div class="method-card zoom-on-scroll" data-delay="0">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="25" cy="25" r="20" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <text x="25" y="32" text-anchor="middle" font-size="20" fill="currentColor">?</text>
+                        </svg>
+                    </div>
+                    <h3>¿Por qué?</h3>
+                    <p>Análisis de motivaciones desde cuatro perspectivas fundamentales</p>
+                    <ul class="motivation-types">
+                        <li><strong>Preceptivas:</strong> Del enunciado del problema</li>
+                        <li><strong>Técnicas:</strong> Leyes y normativas implícitas</li>
+                        <li><strong>Facultativas:</strong> Motivación profesional</li>
+                        <li><strong>Progresistas:</strong> Aportación al conocimiento</li>
+                    </ul>
+                </div>
+
+                <div class="method-card zoom-on-scroll" data-delay="200">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M25 10 L40 25 L25 40 L10 25 Z" stroke="currentColor" stroke-width="2" fill="none"/>
+                        </svg>
+                    </div>
+                    <h3>¿Para qué?</h3>
+                    <p>Identificación de objetivos y finalidades relacionadas con cada motivación</p>
+                </div>
+
+                <div class="method-card zoom-on-scroll" data-delay="400">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="10" y="10" width="30" height="30" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <line x1="20" y1="25" x2="30" y2="25" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <h3>¿Qué es?</h3>
+                    <p>Definición precisa y contextualización del problema a resolver</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Form Section -->
+    <section class="form-section" id="formulario">
+        <div class="container">
+            <div class="form-wrapper zoom-on-scroll">
+                <div class="form-header">
+                    <h2>Iniciar Nuevo Informe</h2>
+                    <p>Introduce la conjetura inicial del problema o asunto a resolver</p>
+                </div>
+
+                <form id="conjeturaForm" class="conjetura-form">
+                    <div class="form-group">
+                        <label for="conjetura">Conjetura Inicial</label>
+                        <textarea 
+                            id="conjetura" 
+                            name="conjetura" 
+                            rows="8" 
+                            placeholder="Describe aquí el problema, caso o situación que requiere un informe pericial motivado. Proporciona todos los detalles relevantes que consideres importantes para el análisis..."
+                            required
+                            minlength="10"
+                        ></textarea>
+                        <div class="char-counter">
+                            <span id="charCount">0</span> caracteres
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            <span class="btn-text">Generar Informe</span>
+                            <span class="btn-loader"></span>
+                        </button>
+                        <button type="reset" class="btn btn-secondary">Limpiar</button>
+                    </div>
+
+                    <div id="responseMessage" class="response-message"></div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Info Section -->
+    <section class="info-section">
+        <div class="container">
+            <div class="info-content zoom-on-scroll">
+                <h3>Integración con Inteligencia Artificial</h3>
+                <p>El sistema utilizará tecnología de IA generativa para analizar tu conjetura inicial y desarrollar un informe completo siguiendo el método formal causal. La integración con la API se implementará en la siguiente fase del proyecto.</p>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <span class="feature-icon">🤖</span>
+                        <p>Análisis automático mediante IA</p>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">📊</span>
+                        <p>Estructuración sistemática</p>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">📝</span>
+                        <p>Redacción profesional</p>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">⚖️</span>
+                        <p>Fundamentación legal</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Sistema de Informes Periciales. Método Formal Causal.</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
