@@ -7,27 +7,33 @@ let paquetesConfig = {
     'preceptivas': {
         titulo: 'Motivaciones Preceptivas',
         descripcion: 'Surgen del propio enunciado del problema',
-        orden: 1
+        orden: 1,
+        key: 'preceptivas'
     },
     'tecnicas': {
         titulo: 'Motivaciones Técnicas',
         descripcion: 'Implícitas en el problema (leyes, normas)',
-        orden: 2
+        orden: 2,
+        key: 'tecnicas'
     },
     'facultativas': {
         titulo: 'Motivaciones Facultativas',
         descripcion: 'Motivación profesional del autor',
-        orden: 3
+        orden: 3,
+        key: 'facultativas'
     },
     'progresistas': {
         titulo: 'Motivaciones Progresistas',
         descripcion: 'Aportación al conocimiento actual',
-        orden: 4
+        orden: 4,
+        key: 'progresistas'
     }
 };
 
 let paqueteActual = null;
 let motivacionesData = null;
+let paquetesProcesando = new Set();
+let paquetesCompletados = new Set();
 
 // ============================================================================
 // INICIALIZACIÓN
@@ -52,20 +58,74 @@ document.addEventListener('DOMContentLoaded', async function() {
 });
 
 // ============================================================================
-// PROCESAR CON AGENTE IA
+// SISTEMA DE NOTIFICACIONES
+// ============================================================================
+
+function mostrarNotificacion(mensaje, tipo = 'info') {
+    const container = document.getElementById('notificacionesContainer') || crearContenedorNotificaciones();
+    
+    const notificacion = document.createElement('div');
+    notificacion.className = `notificacion notificacion-${tipo}`;
+    
+    const iconos = {
+        'info': 'ℹ️',
+        'success': '✅',
+        'error': '❌',
+        'warning': '⚠️',
+        'processing': '🤖'
+    };
+    
+    notificacion.innerHTML = `
+        <span class="notificacion-icono">${iconos[tipo] || iconos.info}</span>
+        <span class="notificacion-mensaje">${mensaje}</span>
+    `;
+    
+    container.appendChild(notificacion);
+    
+    // Animar entrada
+    setTimeout(() => notificacion.classList.add('notificacion-visible'), 10);
+    
+    // Auto-remover después de 5 segundos
+    setTimeout(() => {
+        notificacion.classList.remove('notificacion-visible');
+        setTimeout(() => notificacion.remove(), 300);
+    }, 5000);
+}
+
+function crearContenedorNotificaciones() {
+    const container = document.createElement('div');
+    container.id = 'notificacionesContainer';
+    container.className = 'notificaciones-container';
+    document.body.appendChild(container);
+    return container;
+}
+
+// ============================================================================
+// PROCESAR CON AGENTE IA (ASÍNCRONO)
 // ============================================================================
 
 async function procesarConAgente() {
     const editorContent = document.getElementById('editorContent');
-    const packagesList = document.getElementById('packagesList');
     const generarBtn = document.getElementById('generarInformeBtn');
     
-    // Mostrar estado de carga
+    // Inicializar estructura de datos
+    motivacionesData = {
+        por_que: {
+            preceptivas: [],
+            tecnicas: [],
+            facultativas: [],
+            progresistas: []
+        },
+        para_que: [],
+        que_es: {}
+    };
+    
+    // Mostrar estado de carga inicial
     editorContent.innerHTML = `
         <div class="welcome-message">
             <div class="welcome-icon">🤖</div>
             <h3>Procesando con Inteligencia Artificial</h3>
-            <p>El agente está analizando tu conjetura y generando las motivaciones...</p>
+            <p>Los paquetes aparecerán automáticamente conforme se generen. Puedes empezar a revisar mientras el sistema sigue procesando.</p>
             <div class="loading-spinner"></div>
             <p style="margin-top: 1rem; font-size: 0.9rem; color: #718096;">
                 <strong>Conjetura:</strong><br>
@@ -74,17 +134,16 @@ async function procesarConAgente() {
         </div>
     `;
     
-    packagesList.innerHTML = `
-        <div style="text-align: center; padding: 2rem; color: #718096;">
-            <div class="loading-spinner" style="margin: 0 auto 1rem;"></div>
-            <p>Generando paquetes...</p>
-        </div>
-    `;
-    
     generarBtn.disabled = true;
     generarBtn.innerHTML = '<span class="btn-icon">⏳</span> Procesando...';
     
+    // Renderizar paquetes vacíos inicialmente
+    renderizarPaquetes();
+    
+    mostrarNotificacion('🚀 Iniciando análisis del Método Formal Causal', 'processing');
+    
     try {
+        // Iniciar procesamiento
         const response = await fetch(`/procesar-con-agente/${informeId}`, {
             method: 'POST',
             headers: {
@@ -94,31 +153,35 @@ async function procesarConAgente() {
         
         const result = await response.json();
         
-        if (result.success) {
-            // Guardar los datos de motivaciones
-            motivacionesData = result.analisis;
-            
-            // Renderizar la lista de paquetes
-            renderizarPaquetes();
-            
-            // Mostrar mensaje de éxito
-            editorContent.innerHTML = `
-                <div class="welcome-message">
-                    <div class="welcome-icon">✅</div>
-                    <h3>¡Análisis completado!</h3>
-                    <p>Las motivaciones han sido generadas exitosamente. Selecciona un paquete de la izquierda para revisar y editar.</p>
-                </div>
-            `;
-            
-            generarBtn.disabled = false;
-            generarBtn.innerHTML = '<span class="btn-icon">📄</span> Generar Informe Final';
-            
-        } else {
-            throw new Error(result.message || 'Error al procesar');
+        if (!result.success) {
+            throw new Error(result.message || 'Error al iniciar procesamiento');
         }
+        
+        // Procesar paquetes en secuencia (aparecen conforme se generan)
+        const paquetes = ['preceptivas', 'tecnicas', 'facultativas', 'progresistas'];
+        
+        for (const paquete of paquetes) {
+            await procesarPaquete(paquete);
+        }
+        
+        // Mostrar mensaje de éxito
+        mostrarNotificacion('✅ Análisis completado con éxito', 'success');
+        
+        editorContent.innerHTML = `
+            <div class="welcome-message">
+                <div class="welcome-icon">✅</div>
+                <h3>¡Análisis completado!</h3>
+                <p>Todas las motivaciones han sido generadas exitosamente. Revisa cada paquete y edita lo que necesites antes de generar el informe final.</p>
+            </div>
+        `;
+        
+        generarBtn.disabled = false;
+        generarBtn.innerHTML = '<span class="btn-icon">📄</span> Generar Informe Final';
         
     } catch (error) {
         console.error('Error al procesar con agente:', error);
+        mostrarNotificacion(`Error: ${error.message}`, 'error');
+        
         editorContent.innerHTML = `
             <div class="welcome-message">
                 <div class="welcome-icon">❌</div>
@@ -127,12 +190,42 @@ async function procesarConAgente() {
                 <button class="btn btn-primary" onclick="location.reload()">Reintentar</button>
             </div>
         `;
+    }
+}
+
+async function procesarPaquete(paqueteKey) {
+    const config = paquetesConfig[paqueteKey];
+    
+    mostrarNotificacion(`🔍 Analizando ${config.titulo.toLowerCase()}...`, 'processing');
+    paquetesProcesando.add(paqueteKey);
+    
+    try {
+        const response = await fetch(`/obtener-paquete/${informeId}/${paqueteKey}`);
+        const result = await response.json();
         
-        packagesList.innerHTML = `
-            <div style="text-align: center; padding: 2rem; color: #e53e3e;">
-                <p>Error al generar paquetes</p>
-            </div>
-        `;
+        if (result.success) {
+            // Actualizar datos
+            motivacionesData.por_que[paqueteKey] = result.motivaciones;
+            paquetesCompletados.add(paqueteKey);
+            paquetesProcesando.delete(paqueteKey);
+            
+            // Actualizar UI
+            renderizarPaquetes();
+            
+            const numMotivaciones = result.motivaciones.length;
+            mostrarNotificacion(
+                `✅ ${config.titulo}: ${numMotivaciones} motivación${numMotivaciones !== 1 ? 'es' : ''} generada${numMotivaciones !== 1 ? 's' : ''}`,
+                'success'
+            );
+            
+        } else {
+            throw new Error(result.message || 'Error al procesar paquete');
+        }
+        
+    } catch (error) {
+        paquetesProcesando.delete(paqueteKey);
+        mostrarNotificacion(`❌ Error en ${config.titulo.toLowerCase()}`, 'error');
+        throw error;
     }
 }
 
@@ -153,19 +246,29 @@ function renderizarPaquetes() {
         const config = paquetesConfig[paqueteKey];
         const motivaciones = motivacionesData.por_que[paqueteKey] || [];
         const tieneMotivaciones = motivaciones.length > 0;
+        const estaProcesando = paquetesProcesando.has(paqueteKey);
         
         const paqueteDiv = document.createElement('div');
-        paqueteDiv.className = `package-item ${tieneMotivaciones ? '' : 'disabled'}`;
+        paqueteDiv.className = `package-item ${tieneMotivaciones ? '' : 'disabled'} ${estaProcesando ? 'processing' : ''}`;
         paqueteDiv.dataset.paquete = paqueteKey;
         
         if (tieneMotivaciones) {
             paqueteDiv.onclick = () => seleccionarPaquete(paqueteKey);
         }
         
+        let badgeContent;
+        if (estaProcesando) {
+            badgeContent = '<span class="spinner-small"></span> Procesando...';
+        } else if (tieneMotivaciones) {
+            badgeContent = `${motivaciones.length} motivación${motivaciones.length !== 1 ? 'es' : ''}`;
+        } else {
+            badgeContent = 'Pendiente';
+        }
+        
         paqueteDiv.innerHTML = `
             <div class="package-header">
                 <span class="package-title">${config.titulo}</span>
-                <span class="package-badge">${motivaciones.length} motivacion${motivaciones.length !== 1 ? 'es' : ''}</span>
+                <span class="package-badge">${badgeContent}</span>
             </div>
             <div class="package-description">${config.descripcion}</div>
         `;
