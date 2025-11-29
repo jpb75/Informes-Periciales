@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revisar Motivaciones - Informe Pericial</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/revisar_motivaciones.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="review-container">
+        <!-- Header con botón de generar informe -->
+        <header class="review-header">
+            <div class="header-content">
+                <h1>Revisión de Motivaciones</h1>
+                <div class="header-actions">
+                    <a href="/" class="btn btn-secondary">Volver al inicio</a>
+                    <button id="generarInformeBtn" class="btn btn-primary" onclick="generarInforme()">
+                        <span class="btn-icon">📄</span>
+                        Generar Informe Final
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="review-content">
+            <!-- Panel izquierdo: Lista de paquetes -->
+            <aside class="packages-panel">
+                <h2>Paquetes de Motivaciones</h2>
+                <div class="packages-list" id="packagesList">
+                    <!-- Se llenará dinámicamente con JavaScript -->
+                </div>
+                
+                <div class="panel-info">
+                    <p class="info-text">
+                        <strong>Nota:</strong> Los paquetes se activarán automáticamente conforme el agente de IA genere las motivaciones.
+                    </p>
+                </div>
+            </aside>
+
+            <!-- Panel derecho: Editor de motivaciones -->
+            <main class="editor-panel">
+                <div id="editorContent" class="editor-content">
+                    <div class="welcome-message">
+                        <div class="welcome-icon">📝</div>
+                        <h3>Selecciona un paquete de motivaciones</h3>
+                        <p>Haz clic en uno de los paquetes de la izquierda para revisar y editar las motivaciones generadas por el agente de IA.</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Template para tarjeta de motivación (oculto) -->
+    <template id="motivacionCardTemplate">
+        <div class="motivacion-card" data-paquete="" data-indice="">
+            <div class="motivacion-header">
+                <h4 class="motivacion-titulo-label">Título:</h4>
+                <input type="text" class="motivacion-titulo-input" placeholder="Título de la motivación">
+            </div>
+            <div class="motivacion-body">
+                <h4 class="motivacion-contenido-label">Contenido:</h4>
+                <textarea class="motivacion-contenido-input" rows="5" placeholder="Contenido de la motivación"></textarea>
+            </div>
+            <div class="motivacion-actions">
+                <button class="btn btn-small btn-primary guardar-btn" onclick="guardarMotivacion(this)">
+                    Guardar cambios
+                </button>
+                <span class="save-status"></span>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        // Pasar datos de Flask a JavaScript
+        const informeId = "{{ informe_id }}";
+        const conjetura = {{ conjetura | tojson | safe }};
+        const analisisData = {{ analisis_data | tojson | safe }};
+    </script>
+    <script src="{{ url_for('static', filename='js/revisar_motivaciones.js') }}"></script>
+</body>
+</html>

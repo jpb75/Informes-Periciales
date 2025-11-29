@@ -302,7 +302,12 @@
                         <h4>8.1.1. Motivaciones Preceptivas</h4>
                         <p class="motivacion-desc"><em>Surgen del propio enunciado del problema</em></p>
                         <div class="motivacion-contenido">
-                            {{ informe.analisis.por_que.preceptivas }}
+                            {% for motivacion in informe.analisis.por_que.preceptivas %}
+                            <div class="motivacion-item">
+                                <h5>{{ motivacion.titulo }}</h5>
+                                <p>{{ motivacion.contenido }}</p>
+                            </div>
+                            {% endfor %}
                         </div>
                     </div>
                     
@@ -310,7 +315,12 @@
                         <h4>8.1.2. Motivaciones Técnicas</h4>
                         <p class="motivacion-desc"><em>Implícitas en el problema (leyes, normas, regulaciones)</em></p>
                         <div class="motivacion-contenido">
-                            {{ informe.analisis.por_que.tecnicas }}
+                            {% for motivacion in informe.analisis.por_que.tecnicas %}
+                            <div class="motivacion-item">
+                                <h5>{{ motivacion.titulo }}</h5>
+                                <p>{{ motivacion.contenido }}</p>
+                            </div>
+                            {% endfor %}
                         </div>
                     </div>
                     
@@ -318,7 +328,12 @@
                         <h4>8.1.3. Motivaciones Facultativas</h4>
                         <p class="motivacion-desc"><em>Motivación profesional del autor</em></p>
                         <div class="motivacion-contenido">
-                            {{ informe.analisis.por_que.facultativas }}
+                            {% for motivacion in informe.analisis.por_que.facultativas %}
+                            <div class="motivacion-item">
+                                <h5>{{ motivacion.titulo }}</h5>
+                                <p>{{ motivacion.contenido }}</p>
+                            </div>
+                            {% endfor %}
                         </div>
                     </div>
                     
@@ -326,7 +341,12 @@
                         <h4>8.1.4. Motivaciones Progresistas</h4>
                         <p class="motivacion-desc"><em>Aportación al conocimiento actual</em></p>
                         <div class="motivacion-contenido">
-                            {{ informe.analisis.por_que.progresistas }}
+                            {% for motivacion in informe.analisis.por_que.progresistas %}
+                            <div class="motivacion-item">
+                                <h5>{{ motivacion.titulo }}</h5>
+                                <p>{{ motivacion.contenido }}</p>
+                            </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
@@ -336,16 +356,15 @@
                     <h3 class="fase-titulo">8.2. ¿PARA QUÉ? - Objetivos y Finalidades</h3>
                     
                     <div class="para-que-contenido">
-                        {{ informe.analisis.para_que.contenido }}
-                    </div>
-                    
-                    <div class="relaciones-motivaciones">
-                        <h4>Relación con las motivaciones identificadas:</h4>
-                        <ul>
-                            {% for relacion in informe.analisis.para_que.relaciones %}
-                            <li>{{ relacion }}</li>
-                            {% endfor %}
-                        </ul>
+                        <p class="motivacion-desc"><em>Los objetivos están relacionados con las motivaciones identificadas en la fase anterior.</em></p>
+                        
+                        {% for objetivo in informe.analisis.para_que %}
+                        <div class="objetivo-item">
+                            <h5>{{ objetivo.titulo }}</h5>
+                            <p class="objetivo-tipo"><strong>Tipo:</strong> {{ objetivo.tipo | capitalize }}</p>
+                            <p>{{ objetivo.contenido }}</p>
+                        </div>
+                        {% endfor %}
                     </div>
                 </div>
                 

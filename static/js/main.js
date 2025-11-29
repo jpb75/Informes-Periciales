@@ -112,7 +112,7 @@ function initFormHandling() {
         hideMessage();
         
         try {
-            const response = await fetch('/procesar-conjetura', {
+            const response = await fetch('/iniciar-informe', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -123,14 +123,15 @@ function initFormHandling() {
             const data = await response.json();
             
             if (response.ok && data.success) {
-                showMessage(data.message + ' Redirigiendo al informe...', 'success');
+                showMessage(data.message, 'success');
                 
                 // Animación de éxito
                 submitBtn.classList.add('success');
                 
-                // Redirigir al informe después de un breve delay
+                // Redirigir a la página de revisión si existe, o al informe
+                const redirectUrl = data.redirect_url || `/informe/${data.informe_id}`;
                 setTimeout(() => {
-                    window.location.href = `/informe/${data.informe_id}`;
+                    window.location.href = redirectUrl;
                 }, 1500);
             } else {
                 showMessage(data.message || 'Ha ocurrido un error al procesar la conjetura.', 'error');

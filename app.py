@@ -17,10 +17,11 @@ def index():
     """Renderiza la página principal"""
     return render_template('index.html')
 
-@app.route('/procesar-conjetura', methods=['POST'])
-def procesar_conjetura_endpoint():
+@app.route('/iniciar-informe', methods=['POST'])
+def iniciar_informe():
     """
-    Endpoint para procesar la conjetura inicial usando el agente de IA.
+    Endpoint para iniciar un nuevo informe guardando la conjetura.
+    Redirige a la página de revisión donde se procesará con el agente.
     """
     data = request.get_json()
     conjetura = data.get('conjetura', '')
@@ -34,33 +35,268 @@ def procesar_conjetura_endpoint():
     # Generar ID único para el informe
     informe_id = str(uuid.uuid4())
     
+    # Guardar solo la conjetura inicialmente
+    informes_generados[informe_id] = {
+        'conjetura': conjetura,
+        'analisis': None,
+        'informe_generado': False
+    }
+    
+    return jsonify({
+        'success': True,
+        'message': 'Redirigiendo a revisión...',
+        'informe_id': informe_id,
+        'redirect_url': f'/revisar-motivaciones/{informe_id}'
+    })
+
+@app.route('/procesar-con-agente/<informe_id>', methods=['POST'])
+def procesar_con_agente(informe_id):
+    """
+    Endpoint para iniciar el procesamiento asíncrono con el agente de IA.
+    """
+    if informe_id not in informes_generados:
+        return jsonify({
+            'success': False,
+            'message': 'Informe no encontrado'
+        }), 404
+    
+    # Inicializar estructura de análisis vacía si no existe
+    if not informes_generados[informe_id].get('analisis'):
+        informes_generados[informe_id]['analisis'] = {
+            'por_que': {
+                'preceptivas': [],
+                'tecnicas': [],
+                'facultativas': [],
+                'progresistas': []
+            },
+            'para_que': [],
+            'que_es': {}
+        }
+    
+    return jsonify({
+        'success': True,
+        'message': 'Procesamiento iniciado'
+    })
+
+@app.route('/obtener-paquete/<informe_id>/<paquete>', methods=['GET'])
+def obtener_paquete(informe_id, paquete):
+    """
+    Endpoint para obtener un paquete específico de motivaciones.
+    Procesa el paquete si aún no está generado.
+    """
+    if informe_id not in informes_generados:
+        return jsonify({
+            'success': False,
+            'message': 'Informe no encontrado'
+        }), 404
+    
     try:
-        # Procesar conjetura con el agente de LangGraph + Ollama
-        resultado_agente = procesar_conjetura(conjetura)
+        conjetura = informes_generados[informe_id]['conjetura']
+        analisis = informes_generados[informe_id]['analisis']
         
-        if not resultado_agente['success']:
+        # Verificar si el paquete ya fue generado
+        if paquete in ['preceptivas', 'tecnicas', 'facultativas', 'progresistas']:
+            if analisis['por_que'][paquete]:
+                return jsonify({
+                    'success': True,
+                    'paquete': paquete,
+                    'motivaciones': analisis['por_que'][paquete],
+                    'cached': True
+                })
+            
+            # Generar el paquete específico
+            from agentes.formal_causal_agent import get_llm, safe_llm_call
+            from agentes.formal_causal_agent import (
+                PROMPT_PRECEPTIVAS, PROMPT_TECNICAS, 
+                PROMPT_FACULTATIVAS, PROMPT_PROGRESISTAS
+            )
+            
+            llm = get_llm()
+            prompts = {
+                'preceptivas': PROMPT_PRECEPTIVAS,
+                'tecnicas': PROMPT_TECNICAS,
+                'facultativas': PROMPT_FACULTATIVAS,
+                'progresistas': PROMPT_PROGRESISTAS
+            }
+            
+            prompt = prompts[paquete].format(conjetura=conjetura)
+            result = safe_llm_call(llm, prompt, {paquete: []})
+            motivaciones = result.get(paquete, [])
+            
+            # Guardar en memoria
+            analisis['por_que'][paquete] = motivaciones
+            
             return jsonify({
-                'success': False,
-                'message': f'Error al procesar la conjetura: {resultado_agente.get("error", "Error desconocido")}'
-            }), 500
+                'success': True,
+                'paquete': paquete,
+                'motivaciones': motivaciones,
+                'cached': False
+            })
+            
+        elif paquete == 'objetivos':
+            if analisis['para_que']:
+                return jsonify({
+                    'success': True,
+                    'paquete': 'objetivos',
+                    'objetivos': analisis['para_que'],
+                    'cached': True
+                })
+            
+            # Generar objetivos
+            from agentes.formal_causal_agent import get_llm, safe_llm_call, PROMPT_OBJETIVOS
+            import json
+            
+            llm = get_llm()
+            preceptivas_str = json.dumps(analisis['por_que']['preceptivas'], indent=2, ensure_ascii=False)
+            tecnicas_str = json.dumps(analisis['por_que']['tecnicas'], indent=2, ensure_ascii=False)
+            facultativas_str = json.dumps(analisis['por_que']['facultativas'], indent=2, ensure_ascii=False)
+            progresistas_str = json.dumps(analisis['por_que']['progresistas'], indent=2, ensure_ascii=False)
+            
+            prompt = PROMPT_OBJETIVOS.format(
+                conjetura=conjetura,
+                preceptivas=preceptivas_str,
+                tecnicas=tecnicas_str,
+                facultativas=facultativas_str,
+                progresistas=progresistas_str
+            )
+            
+            result = safe_llm_call(llm, prompt, {"para_que": []})
+            objetivos = result.get('para_que', [])
+            analisis['para_que'] = objetivos
+            
+            return jsonify({
+                'success': True,
+                'paquete': 'objetivos',
+                'objetivos': objetivos,
+                'cached': False
+            })
+            
+        elif paquete == 'que_es':
+            if analisis['que_es']:
+                return jsonify({
+                    'success': True,
+                    'paquete': 'que_es',
+                    'definicion': analisis['que_es'],
+                    'cached': True
+                })
+            
+            # Generar qué es
+            from agentes.formal_causal_agent import get_llm, safe_llm_call, PROMPT_QUE_ES
+            import json
+            
+            llm = get_llm()
+            preceptivas_str = json.dumps(analisis['por_que']['preceptivas'], indent=2, ensure_ascii=False)
+            tecnicas_str = json.dumps(analisis['por_que']['tecnicas'], indent=2, ensure_ascii=False)
+            facultativas_str = json.dumps(analisis['por_que']['facultativas'], indent=2, ensure_ascii=False)
+            progresistas_str = json.dumps(analisis['por_que']['progresistas'], indent=2, ensure_ascii=False)
+            objetivos_str = json.dumps(analisis['para_que'], indent=2, ensure_ascii=False)
+            
+            prompt = PROMPT_QUE_ES.format(
+                conjetura=conjetura,
+                preceptivas=preceptivas_str,
+                tecnicas=tecnicas_str,
+                facultativas=facultativas_str,
+                progresistas=progresistas_str,
+                objetivos=objetivos_str
+            )
+            
+            result = safe_llm_call(llm, prompt, {"que_es": {}})
+            definicion = result.get('que_es', {})
+            analisis['que_es'] = definicion
+            
+            return jsonify({
+                'success': True,
+                'paquete': 'que_es',
+                'definicion': definicion,
+                'cached': False
+            })
         
-        # Construir informe completo con el análisis del agente
-        informe_data = generar_informe_con_ia(conjetura, resultado_agente['analisis'])
+        return jsonify({
+            'success': False,
+            'message': 'Paquete no reconocido'
+        }), 400
         
-        # Guardar el informe temporalmente
-        informes_generados[informe_id] = informe_data
+    except Exception as e:
+        print(f"Error al obtener paquete {paquete}: {e}")
+        return jsonify({
+            'success': False,
+            'message': f'Error: {str(e)}'
+        }), 500
+
+@app.route('/revisar-motivaciones/<informe_id>')
+def revisar_motivaciones(informe_id):
+    """Página para revisar y editar motivaciones antes de generar el informe"""
+    if informe_id not in informes_generados:
+        return redirect(url_for('index'))
+    
+    data = informes_generados[informe_id]
+    return render_template('revisar_motivaciones.html', 
+                         informe_id=informe_id,
+                         conjetura=data['conjetura'],
+                         analisis_data=data.get('analisis'))
+
+@app.route('/guardar-motivacion', methods=['POST'])
+def guardar_motivacion():
+    """Guardar una motivación editada"""
+    data = request.get_json()
+    informe_id = data.get('informe_id')
+    paquete = data.get('paquete')
+    indice = data.get('indice')
+    motivacion = data.get('motivacion')
+    
+    if informe_id not in informes_generados:
+        return jsonify({
+            'success': False,
+            'message': 'Informe no encontrado'
+        }), 404
+    
+    try:
+        # Actualizar la motivación en memoria
+        analisis = informes_generados[informe_id]['analisis']
+        analisis['por_que'][paquete][indice] = motivacion
         
         return jsonify({
             'success': True,
-            'message': 'Informe generado correctamente con IA.',
-            'informe_id': informe_id
+            'message': 'Motivación guardada correctamente'
         })
-        
     except Exception as e:
-        print(f"Error al procesar conjetura: {e}")
+        print(f"Error al guardar motivación: {e}")
         return jsonify({
             'success': False,
-            'message': f'Error interno al procesar la conjetura: {str(e)}'
+            'message': f'Error al guardar: {str(e)}'
+        }), 500
+
+@app.route('/generar-informe-final', methods=['POST'])
+def generar_informe_final():
+    """Generar el informe final después de revisar las motivaciones"""
+    data = request.get_json()
+    informe_id = data.get('informe_id')
+    
+    if informe_id not in informes_generados:
+        return jsonify({
+            'success': False,
+            'message': 'Informe no encontrado'
+        }), 404
+    
+    try:
+        datos = informes_generados[informe_id]
+        
+        # Generar el informe completo con las motivaciones revisadas
+        informe_data = generar_informe_con_ia(datos['conjetura'], datos['analisis'])
+        
+        # Reemplazar los datos con el informe completo
+        informes_generados[informe_id] = informe_data
+        informes_generados[informe_id]['informe_generado'] = True
+        
+        return jsonify({
+            'success': True,
+            'message': 'Informe generado correctamente'
+        })
+    except Exception as e:
+        print(f"Error al generar informe final: {e}")
+        return jsonify({
+            'success': False,
+            'message': f'Error al generar informe: {str(e)}'
         }), 500
 
 @app.route('/informe/<informe_id>')
@@ -70,6 +306,11 @@ def ver_informe(informe_id):
         return redirect(url_for('index'))
     
     informe_data = informes_generados[informe_id]
+    
+    # Si el informe no ha sido generado aún, redirigir a revisión
+    if not informe_data.get('informe_generado', True):
+        return redirect(url_for('revisar_motivaciones', informe_id=informe_id))
+    
     return render_template('informe.html', informe=informe_data, informe_id=informe_id)
 
 @app.route('/mapa-conceptual/<informe_id>')
