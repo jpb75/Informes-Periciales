@@ -3,6 +3,9 @@ import os
 from datetime import datetime
 import uuid
 
+# Importar el agente de LangGraph
+from agentes import procesar_conjetura
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key-here'
 
@@ -15,10 +18,9 @@ def index():
     return render_template('index.html')
 
 @app.route('/procesar-conjetura', methods=['POST'])
-def procesar_conjetura():
+def procesar_conjetura_endpoint():
     """
-    Endpoint para procesar la conjetura inicial.
-    En el futuro, aquí se implementará la lógica de la API de IA.
+    Endpoint para procesar la conjetura inicial usando el agente de IA.
     """
     data = request.get_json()
     conjetura = data.get('conjetura', '')
@@ -32,18 +34,34 @@ def procesar_conjetura():
     # Generar ID único para el informe
     informe_id = str(uuid.uuid4())
     
-    # TODO: Implementar lógica de procesamiento con IA
-    # Por ahora, generamos datos simulados
-    informe_data = generar_informe_demo(conjetura)
-    
-    # Guardar el informe temporalmente
-    informes_generados[informe_id] = informe_data
-    
-    return jsonify({
-        'success': True,
-        'message': 'Informe generado correctamente.',
-        'informe_id': informe_id
-    })
+    try:
+        # Procesar conjetura con el agente de LangGraph + Ollama
+        resultado_agente = procesar_conjetura(conjetura)
+        
+        if not resultado_agente['success']:
+            return jsonify({
+                'success': False,
+                'message': f'Error al procesar la conjetura: {resultado_agente.get("error", "Error desconocido")}'
+            }), 500
+        
+        # Construir informe completo con el análisis del agente
+        informe_data = generar_informe_con_ia(conjetura, resultado_agente['analisis'])
+        
+        # Guardar el informe temporalmente
+        informes_generados[informe_id] = informe_data
+        
+        return jsonify({
+            'success': True,
+            'message': 'Informe generado correctamente con IA.',
+            'informe_id': informe_id
+        })
+        
+    except Exception as e:
+        print(f"Error al procesar conjetura: {e}")
+        return jsonify({
+            'success': False,
+            'message': f'Error interno al procesar la conjetura: {str(e)}'
+        }), 500
 
 @app.route('/informe/<informe_id>')
 def ver_informe(informe_id):
@@ -90,8 +108,14 @@ def metodo_info():
     }
     return jsonify(metodo)
 
-def generar_informe_demo(conjetura):
-    """Genera datos de demostración para el informe"""
+def generar_informe_con_ia(conjetura: str, analisis: dict):
+    """
+    Genera un informe completo usando el análisis del agente de IA
+    
+    Args:
+        conjetura: Texto de la conjetura inicial
+        analisis: Diccionario con el análisis generado por el agente (por_que, para_que, que_es)
+    """
     fecha_actual = datetime.now().strftime('%d de %B de %Y')
     
     return {
@@ -156,78 +180,9 @@ def generar_informe_demo(conjetura):
         },
         
         'analisis': {
-            'por_que': {
-                'preceptivas': [
-                    {
-                        'titulo': 'Análisis del enunciado del problema',
-                        'contenido': 'Estudio detallado de los elementos esenciales del problema tal como ha sido formulado, identificando los aspectos críticos que requieren atención pericial.'
-                    }
-                ],
-                'tecnicas': [
-                    {
-                        'titulo': 'Marco normativo aplicable',
-                        'contenido': 'Identificación y análisis de las leyes, normas técnicas, reglamentos y estándares profesionales que resultan de aplicación al presente caso.'
-                    }
-                ],
-                'facultativas': [
-                    {
-                        'titulo': 'Interés profesional en el caso',
-                        'contenido': 'Motivación del perito para aplicar su experiencia y conocimientos especializados en la resolución técnica del problema planteado.'
-                    }
-                ],
-                'progresistas': [
-                    {
-                        'titulo': 'Aportación al conocimiento técnico',
-                        'contenido': 'Identificación de aspectos novedosos o particulares del caso que pueden contribuir al desarrollo de las mejores prácticas en el ámbito profesional.'
-                    }
-                ]
-            },
-            'para_que': [
-                {
-                    'titulo': 'Establecer la verdad técnica de los hechos',
-                    'tipo': 'preceptivas',
-                    'contenido': 'Determinar con precisión y rigor técnico la naturaleza y características de los hechos objeto de análisis.'
-                },
-                {
-                    'titulo': 'Fundamentar la decisión judicial',
-                    'tipo': 'preceptivas',
-                    'contenido': 'Proporcionar elementos técnicos que permitan al órgano judicial resolver con criterios objetivos y fundamentados.'
-                },
-                {
-                    'titulo': 'Garantizar el cumplimiento normativo',
-                    'tipo': 'tecnicas',
-                    'contenido': 'Verificar la conformidad o disconformidad de las circunstancias analizadas con la normativa técnica aplicable.'
-                },
-                {
-                    'titulo': 'Establecer responsabilidades técnicas',
-                    'tipo': 'tecnicas',
-                    'contenido': 'Determinar si existen responsabilidades derivadas del incumplimiento de normativas o estándares profesionales.'
-                },
-                {
-                    'titulo': 'Aplicar conocimientos especializados',
-                    'tipo': 'facultativas',
-                    'contenido': 'Poner al servicio del proceso judicial la experiencia y formación técnica del perito en la materia.'
-                },
-                {
-                    'titulo': 'Contribuir a la resolución de conflictos',
-                    'tipo': 'facultativas',
-                    'contenido': 'Facilitar la comprensión técnica del caso para permitir una resolución justa y fundamentada del conflicto.'
-                },
-                {
-                    'titulo': 'Generar precedentes técnicos',
-                    'tipo': 'progresistas',
-                    'contenido': 'Establecer criterios técnicos que puedan servir de referencia para casos similares en el futuro.'
-                },
-                {
-                    'titulo': 'Avanzar en la metodología pericial',
-                    'tipo': 'progresistas',
-                    'contenido': 'Desarrollar o mejorar procedimientos de análisis pericial aplicables al ámbito profesional correspondiente.'
-                }
-            ],
-            'que_es': {
-                'contenido': 'Definición precisa del problema objeto de análisis, estableciendo sus características fundamentales, naturaleza técnica y alcance. Esta definición constituye la base conceptual sobre la que se desarrolla todo el análisis pericial.',
-                'contexto': 'Contextualización del problema dentro del marco técnico, legal y práctico aplicable, identificando los elementos que lo definen y diferencia, así como su relación con situaciones similares en el ámbito profesional.'
-            },
+            'por_que': analisis['por_que'],  # Datos generados por la IA
+            'para_que': analisis['para_que'],  # Datos generados por la IA
+            'que_es': analisis['que_es'],  # Datos generados por la IA
             'inspecciones': 'Descripción detallada de las inspecciones realizadas, metodología empleada, condiciones de la inspección y observaciones relevantes.',
             'resultados': 'Presentación de resultados técnicos, cálculos realizados, mediciones obtenidas y datos cuantitativos relevantes para el análisis.',
             'evaluacion': 'Evaluación objetiva de los resultados obtenidos, contrastándolos con los estándares técnicos aplicables y la normativa vigente.'
@@ -260,6 +215,58 @@ def generar_informe_demo(conjetura):
             'fecha': fecha_actual
         }
     }
+
+
+def generar_informe_demo(conjetura):
+    """
+    Genera datos de demostración para el informe (BACKUP)
+    Esta función se mantiene como respaldo en caso de que falle la IA
+    """
+    fecha_actual = datetime.now().strftime('%d de %B de %Y')
+    
+    # Análisis básico de respaldo
+    analisis_demo = {
+        'por_que': {
+            'preceptivas': [
+                {
+                    'titulo': 'Análisis del enunciado del problema',
+                    'contenido': 'Estudio detallado de los elementos esenciales del problema tal como ha sido formulado.'
+                }
+            ],
+            'tecnicas': [
+                {
+                    'titulo': 'Marco normativo aplicable',
+                    'contenido': 'Identificación de leyes, normas técnicas y estándares profesionales aplicables.'
+                }
+            ],
+            'facultativas': [
+                {
+                    'titulo': 'Interés profesional en el caso',
+                    'contenido': 'Motivación del perito para aplicar conocimientos especializados.'
+                }
+            ],
+            'progresistas': [
+                {
+                    'titulo': 'Aportación al conocimiento técnico',
+                    'contenido': 'Identificación de aspectos novedosos del caso.'
+                }
+            ]
+        },
+        'para_que': [
+            {
+                'titulo': 'Establecer la verdad técnica de los hechos',
+                'tipo': 'preceptivas',
+                'contenido': 'Determinar con precisión la naturaleza de los hechos.'
+            }
+        ],
+        'que_es': {
+            'contenido': 'Definición precisa del problema objeto de análisis.',
+            'contexto': 'Contextualización del problema dentro del marco técnico aplicable.'
+        }
+    }
+    
+    return generar_informe_con_ia(conjetura, analisis_demo)
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

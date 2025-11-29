@@ -1,193 +1,352 @@
 # Sistema de Informes Periciales
-## Método Formal Causal
 
-Sistema web para la redacción de informes motivados mediante el Método Formal Causal, desarrollado con Python y Flask.
-
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
-![Python](https://img.shields.io/badge/python-3.8+-green)
+![Version](https://img.shields.io/badge/version-2.0.0-blue)
+![Python](https://img.shields.io/badge/python-3.10+-green)
 ![Flask](https://img.shields.io/badge/flask-3.0.0-red)
+![IA](https://img.shields.io/badge/IA-Llama%203.1-purple)
 
-## 📋 Descripción
+Sistema web para la redacción de informes periciales motivados mediante el **Método Formal Causal**, potenciado por IA local (LangGraph + Ollama).
 
-Esta aplicación web permite iniciar la redacción de informes periciales motivados siguiendo el **Método Formal Causal**, que estructura el análisis mediante tres preguntas fundamentales:
+## 🎯 Características
 
-### El Método Formal Causal
+- ✅ **Generación automática con IA** - Análisis contextualizado mediante Llama 3.1
+- ✅ **Procesamiento 100% local** - Sin envío de datos externos (privacidad total)
+- ✅ **Método Formal Causal** - Estructura de 3 preguntas: ¿Por qué?, ¿Para qué?, ¿Qué es?
+- ✅ **Informes profesionales** - 11 secciones listas para uso legal
+- ✅ **Mapa conceptual interactivo** - Visualización navegable del análisis
+- ✅ **Interfaz moderna** - Diseño responsive con animaciones
 
-1. **¿Por qué?** - Análisis de motivaciones en cuatro dimensiones:
-   - **Preceptivas**: Surgen del propio enunciado del problema
-   - **Técnicas**: Implícitas en el problema (leyes, normas, regulaciones)
-   - **Facultativas**: Motivación profesional del autor
-   - **Progresistas**: Aportación al conocimiento actual
+---
 
-2. **¿Para qué?** - Objetivos y finalidades relacionadas con cada motivación
+## 🚀 Instalación Rápida
 
-3. **¿Qué es?** - Definición y contextualización del problema
+### 1. Requisitos Previos
 
-## 🎨 Características
+- **Python 3.10 o superior**
+- **Ollama** para ejecutar modelos IA localmente
+- **uv** (gestor de paquetes ultrarrápido)
 
-- **Interfaz moderna y profesional** con efectos visuales atractivos
-- **Animaciones de scroll** con efecto parallax
-- **Zoom progresivo** de elementos al hacer scroll
-- **Formulario interactivo** con validación en tiempo real
-- **Contador de caracteres** con indicadores visuales
-- **Auto-guardado** de borradores en el navegador
-- **Mapa Conceptual Interactivo** para visualizar motivaciones y objetivos
-  - Navegación visual por las 4 tipos de motivaciones
-  - Visualización de objetivos relacionados con cada motivación
-  - Expansión/colapso de nodos con efectos animados
-  - Atajos de teclado (E: expandir todo, C: colapsar todo)
-- **Generación de Informes Profesionales**
-  - 11 secciones estructuradas según método pericial
-  - Formato profesional apto para presentación legal
-  - Funciones de impresión y exportación
-- **Diseño responsive** adaptable a dispositivos móviles
-- **Preparado para integración con IA** (próximamente)
+### 2. Instalar Ollama
 
-## 🚀 Instalación
+#### Windows
+```powershell
+# Descargar e instalar desde: https://ollama.ai/download
+# O usar winget:
+winget install Ollama.Ollama
+```
 
-### Requisitos previos
+#### Verificar instalación
+```powershell
+ollama --version
+```
 
-- Python 3.8 o superior
-- pip (gestor de paquetes de Python)
+#### Descargar modelo Llama 3.1
+```powershell
+ollama pull llama3.1
+```
 
-### Pasos de instalación
+Esto descargará ~4.7 GB. El modelo se ejecuta completamente en tu máquina.
 
-1. **Clonar o descargar** el repositorio en tu máquina local
+### 3. Instalar uv
 
-2. **Crear un entorno virtual** (recomendado):
-   ```powershell
-   python -m venv venv
-   ```
+#### ¿Por qué uv en lugar de pip?
 
-3. **Activar el entorno virtual**:
-   ```powershell
-   .\venv\Scripts\Activate.ps1
-   ```
-   
-   Si encuentras un error de permisos en PowerShell, ejecuta:
-   ```powershell
-   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-   ```
+| Característica | uv | pip |
+|----------------|-----|-----|
+| **Velocidad** | ⚡ 10-100x más rápido | 🐢 Lento |
+| **Gestión de venv** | 🤖 Automática | 🔧 Manual |
+| **Lock file** | ✅ uv.lock garantiza reproducibilidad | ❌ Sin lock file nativo |
+| **Resolución de dependencias** | 🚀 Ultrarrápida | 🕐 Lenta en proyectos grandes |
+| **Instalación** | 📦 Todo en uno (pip + pip-tools + venv) | 🔀 Múltiples herramientas |
+| **Escritura en Rust** | ✅ Optimizado y seguro | ⚠️ Python (más lento) |
 
-4. **Instalar las dependencias**:
-   ```powershell
-   pip install -r requirements.txt
-   ```
+**Comparativa real**:
+```
+Instalar 40 paquetes:
+pip: ~45 segundos
+uv:  ~2 segundos  ⚡
+```
+
+#### Instalar uv en Windows
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+#### Verificar instalación
+```powershell
+uv --version
+```
+
+### 4. Clonar e Instalar el Proyecto
+
+```powershell
+# Clonar repositorio
+git clone https://github.com/jpb75/Informes-Periciales.git
+cd Informes-Periciales
+
+# Sincronizar dependencias (crea .venv automáticamente)
+uv sync
+```
+
+**¿Qué hace `uv sync`?**
+1. Lee `pyproject.toml`
+2. Crea entorno virtual en `.venv/`
+3. Instala todas las dependencias
+4. Genera `uv.lock` para reproducibilidad
+
+---
 
 ## 💻 Uso
 
-1. **Ejecutar la aplicación**:
-   ```powershell
-   python app.py
-   ```
+### Ejecutar la Aplicación
 
-2. **Abrir el navegador** y visitar:
-   ```
-   http://localhost:5000
-   ```
+```powershell
+uv run python app.py
+```
 
-3. **Usar la aplicación**:
-   - Desplázate por la página para conocer el método
-   - Introduce tu conjetura inicial en el formulario
-   - El sistema guardará automáticamente tu progreso
-   - Presiona "Generar Informe" para procesar la conjetura
-   - **Ver Informe Completo**: Visualiza el informe profesional de 11 secciones
-   - **Mapa Conceptual**: Navega interactivamente por las motivaciones y objetivos
-     - Haz clic en "Ver más" en cada nodo para expandir detalles
-     - Usa la tecla `E` para expandir todos los nodos
-     - Usa la tecla `C` para colapsar todos los nodos
-     - Usa las flechas ↑↓ para navegar entre nodos
+### Abrir en el Navegador
+
+```
+http://localhost:5000
+```
+
+### Flujo de Uso
+
+1. **Introduce tu conjetura** en el formulario (describe el caso pericial)
+2. **Espera 30-60 segundos** mientras la IA procesa
+3. **Visualiza tu informe** en formato profesional o mapa conceptual
+4. **Imprime o exporta** el resultado
+
+---
+
+## 📊 El Método Formal Causal
+
+Metodología estructurada para análisis periciales basada en 3 preguntas fundamentales:
+
+### 1. ¿Por qué? - Motivaciones (4 tipos)
+
+- **Preceptivas**: Del enunciado del problema
+- **Técnicas**: Leyes, normas y regulaciones aplicables
+- **Facultativas**: Motivación profesional del perito
+- **Progresistas**: Aportación al conocimiento actual
+
+### 2. ¿Para qué? - Objetivos
+
+6-8 objetivos relacionados con cada tipo de motivación.
+
+### 3. ¿Qué es? - Definición
+
+Definición precisa y contextualización del problema.
+
+---
+
+## 🤖 Cómo Funciona la IA
+
+```
+Conjetura del usuario
+      ↓
+Agente LangGraph (6 pasos secuenciales)
+      ├─ 1. Analiza motivaciones PRECEPTIVAS
+      ├─ 2. Analiza motivaciones TÉCNICAS
+      ├─ 3. Analiza motivaciones FACULTATIVAS
+      ├─ 4. Analiza motivaciones PROGRESISTAS
+      ├─ 5. Genera OBJETIVOS vinculados
+      └─ 6. Define QUÉ ES el problema
+      ↓
+Informe completo (11 secciones)
+```
+
+**Cada paso** usa el contexto de los pasos anteriores para mantener coherencia y relación entre todos los elementos del análisis.
+
+---
 
 ## 📁 Estructura del Proyecto
 
 ```
-InformesPericiales/
+Informes-Periciales/
+├── app.py                          # Backend Flask
+├── pyproject.toml                  # Config + dependencias
+├── uv.lock                         # Lock file
 │
-├── app.py                      # Aplicación principal Flask
-├── requirements.txt            # Dependencias del proyecto
-├── README.md                   # Este archivo
+├── agentes/
+│   ├── __init__.py
+│   └── formal_causal_agent.py     # Agente IA (LangGraph + prompts)
 │
-├── templates/
-│   ├── index.html             # Página principal
-│   ├── informe.html           # Vista del informe completo
-│   └── mapa_conceptual.html   # Visualización interactiva del método
+├── templates/                      # HTML
+│   ├── index.html
+│   ├── informe.html
+│   └── mapa_conceptual_v2.html
 │
-└── static/
-    ├── css/
-    │   ├── styles.css         # Estilos principales
-    │   ├── informe.css        # Estilos del informe
-    │   └── mapa_conceptual.css # Estilos del mapa conceptual
-    │
-    ├── js/
-    │   ├── main.js            # Lógica principal del cliente
-    │   ├── informe.js         # Funcionalidad del informe
-    │   └── mapa_conceptual.js # Interactividad del mapa
-    │
-    └── images/                # Imágenes del proyecto
+├── static/                         # CSS + JavaScript
+│
+├── docs/
+│   └── GUIA_COMPLETA.md           # Documentación técnica detallada
+│
+└── README.md                       # Este archivo
 ```
 
-## 🔧 Configuración
+---
 
-### Variables de entorno (opcional)
+## 🛠️ Tecnologías
 
-Puedes crear un archivo `.env` para configurar:
+### Backend
+- **Flask 3.0** - Framework web
+- **Python 3.10+** - Lenguaje base
 
-```env
-FLASK_ENV=development
-SECRET_KEY=tu-clave-secreta-aqui
-FLASK_PORT=5000
+### IA
+- **LangGraph** - Framework de agentes con grafos de estado
+- **LangChain** - Abstracción para LLMs
+- **Ollama** - Runtime local de modelos IA
+- **Llama 3.1** - Modelo de lenguaje de Meta (4.7 GB)
+
+### Gestión
+- **uv** - Gestor de paquetes ultrarrápido
+- **pyproject.toml** - Configuración estándar Python
+
+---
+
+## ⚙️ Configuración
+
+### Cambiar el Modelo de IA
+
+Edita `agentes/formal_causal_agent.py`:
+
+```python
+OLLAMA_MODEL = "llama3.1"  # Cambiar aquí
+OLLAMA_TEMPERATURE = 0.3   # Ajustar creatividad (0.1-1.0)
 ```
 
-### Integración con IA (Próximamente)
+Modelos disponibles: https://ollama.ai/library
 
-La aplicación está preparada para integrarse con APIs de IA generativa. El endpoint `/procesar-conjetura` está listo para recibir y procesar las conjeturas, y será donde se implemente la lógica de generación de informes mediante IA.
+### Modificar Prompts
 
-## 🎯 Próximas Funcionalidades
+Los prompts están en `agentes/formal_causal_agent.py`. Edita las constantes `PROMPT_PRECEPTIVAS`, `PROMPT_TECNICAS`, etc.
 
-- [x] Mapa Conceptual Interactivo
-- [x] Generación de Informes Profesionales
-- [x] Navegación entre vista de informe y mapa conceptual
-- [ ] Integración con API de IA generativa (OpenAI, Anthropic, etc.)
-- [ ] Generación automática de contenido mediante IA
-- [ ] Sistema de plantillas personalizables
-- [ ] Exportación a PDF mejorada
-- [ ] Historial de informes generados
-- [ ] Sistema de usuarios y autenticación
-- [ ] Dashboard de informes
-- [ ] Edición in-situ de secciones del informe
+---
 
-## 🛠️ Tecnologías Utilizadas
+## 🔧 Comandos Útiles con uv
 
-- **Backend**: Python 3.x, Flask 3.0
-- **Frontend**: HTML5, CSS3, JavaScript (Vanilla)
-- **Fuentes**: Google Fonts (Playfair Display, Roboto)
-- **Diseño**: CSS Grid, Flexbox, Animaciones CSS
+```powershell
+# Instalar dependencias
+uv sync
 
-## 📝 Notas de Desarrollo
+# Ejecutar aplicación
+uv run python app.py
 
-- El sistema actualmente usa datos de demostración con:
-  - **4 motivaciones** (una por cada tipo: preceptivas, técnicas, facultativas, progresistas)
-  - **8 objetivos** ("para qués") relacionados con las motivaciones (2 por cada tipo)
-  - Estructura completa de 11 secciones del informe pericial
-- Los informes se guardan temporalmente en memoria (`informes_generados`)
-- El mapa conceptual permite visualizar la estructura del Método Formal Causal
-- Las animaciones están optimizadas con `requestAnimationFrame`
-- El diseño es completamente responsive
-- El informe generado es profesional, sin marcadores de IA, apto para uso legal
+# Añadir nueva dependencia
+uv add nombre-paquete
+
+# Añadir dependencia de desarrollo
+uv add --dev nombre-paquete
+
+# Actualizar dependencias
+uv sync --upgrade
+
+# Ver dependencias instaladas
+uv pip list
+```
+
+---
+
+## ❓ Solución de Problemas
+
+### Ollama no responde
+```powershell
+# Verificar que está corriendo
+ollama serve
+```
+
+### Modelo no encontrado
+```powershell
+# Descargar el modelo
+ollama pull llama3.1
+```
+
+### Error al importar módulos
+```powershell
+# Resincronizar dependencias
+uv sync
+```
+
+### Procesamiento muy lento
+
+**Causas**:
+- Primera ejecución (carga modelo en memoria)
+- RAM insuficiente (< 8GB)
+
+**Soluciones**:
+- Esperar a segunda ejecución (será más rápida)
+- Usar modelo más pequeño: `ollama pull llama3.2:1b`
+
+---
+
+## 📚 Documentación Completa
+
+Para información técnica detallada, arquitectura del sistema, y guías avanzadas:
+
+👉 **[docs/GUIA_COMPLETA.md](docs/GUIA_COMPLETA.md)**
+
+---
+
+## 🎯 Ejemplo de Uso
+
+### Conjetura de Ejemplo
+
+```
+Se requiere evaluar si un edificio de viviendas de 5 plantas cumple 
+con la normativa vigente de eficiencia energética y accesibilidad. 
+Los vecinos reportan problemas de humedad en las plantas bajas y 
+ausencia de rampa de acceso para personas con movilidad reducida.
+```
+
+### Resultado
+
+El sistema generará automáticamente:
+- 4 tipos de motivaciones (10-14 en total)
+- 6-8 objetivos contextualizados
+- Definición precisa del problema
+- Informe de 11 secciones profesionales
+
+**Tiempo de procesamiento**: 30-60 segundos
+
+---
+
+## 📝 Requisitos del Sistema
+
+- **Python**: 3.10 o superior
+- **RAM**: 8 GB mínimo, 16 GB recomendado
+- **Espacio**: 5 GB para modelo Llama 3.1
+- **CPU**: Procesador multinúcleo moderno
+- **GPU**: Opcional (acelera procesamiento)
+- **SO**: Windows, macOS, Linux
+
+---
 
 ## 🤝 Contribuciones
 
-Este es un proyecto en desarrollo activo. Las sugerencias y mejoras son bienvenidas.
+Las sugerencias y mejoras son bienvenidas. Este es un proyecto en desarrollo activo.
+
+---
 
 ## 📄 Licencia
 
-Proyecto desarrollado para uso académico y profesional.
+Proyecto desarrollado para uso académico y profesional en el ámbito de informes periciales.
+
+---
 
 ## 👤 Autor
 
 Sistema desarrollado para la investigación y redacción de informes periciales motivados.
 
+**Repositorio**: https://github.com/jpb75/Informes-Periciales  
+**Versión**: 2.0.0  
+**Última actualización**: Noviembre 2025
+
 ---
 
-**Versión**: 1.0.0  
-**Última actualización**: Noviembre 2025
+## 🔗 Enlaces Útiles
+
+- [Ollama](https://ollama.ai) - Runtime de modelos IA
+- [uv](https://docs.astral.sh/uv/) - Gestor de paquetes Python
+- [LangGraph](https://langchain-ai.github.io/langgraph/) - Framework de agentes
+- [Flask](https://flask.palletsprojects.com/) - Framework web Python

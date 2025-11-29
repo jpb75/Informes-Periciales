@@ -1,0 +1,15 @@
+[project]
+name = "informes-periciales"
+version = "2.0.0"
+description = "Sistema de Informes Periciales con IA - Método Formal Causal"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "flask==3.0.0",
+    "langchain-core>=1.1.0",
+    "langchain-ollama>=1.0.0",
+    "langgraph>=1.0.4",
+]
+
+[project.urls]
+Repository = "https://github.com/jpb75/Informes-Periciales"
