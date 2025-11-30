@@ -2,9 +2,16 @@ from flask import Flask, render_template, request, jsonify, session, redirect, u
 import os
 from datetime import datetime
 import uuid
+import json
 
 # Importar el agente de LangGraph
 from agentes import procesar_conjetura
+from agentes.formal_causal_agent import (
+    get_llm, safe_llm_call,
+    PROMPT_PRECEPTIVAS, PROMPT_TECNICAS, 
+    PROMPT_FACULTATIVAS, PROMPT_PROGRESISTAS,
+    PROMPT_OBJETIVOS, PROMPT_QUE_ES
+)
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key-here'
@@ -35,6 +42,11 @@ def iniciar_informe():
     # Generar ID único para el informe
     informe_id = str(uuid.uuid4())
     
+    print(f"\n{'='*60}")
+    print(f"🚀 NUEVO INFORME INICIADO - ID: {informe_id[:8]}...")
+    print(f"{'='*60}")
+    print(f"Conjetura: {conjetura[:100]}...")
+    
     # Guardar solo la conjetura inicialmente
     informes_generados[informe_id] = {
         'conjetura': conjetura,
@@ -59,6 +71,10 @@ def procesar_con_agente(informe_id):
             'success': False,
             'message': 'Informe no encontrado'
         }), 404
+    
+    print(f"\n{'='*60}")
+    print(f"🚀 INICIANDO ANÁLISIS DEL MÉTODO FORMAL CAUSAL")
+    print(f"{'='*60}\n")
     
     # Inicializar estructura de análisis vacía si no existe
     if not informes_generados[informe_id].get('analisis'):
@@ -94,9 +110,22 @@ def obtener_paquete(informe_id, paquete):
         conjetura = informes_generados[informe_id]['conjetura']
         analisis = informes_generados[informe_id]['analisis']
         
+        print(f"DEBUG: Solicitado paquete='{paquete}', tipo={type(paquete)}")
+        
+        # Diccionario de prompts (fuera del if para evitar scope issues)
+        prompts_motivaciones = {
+            'preceptivas': PROMPT_PRECEPTIVAS,
+            'tecnicas': PROMPT_TECNICAS,
+            'facultativas': PROMPT_FACULTATIVAS,
+            'progresistas': PROMPT_PROGRESISTAS
+        }
+        
+        print(f"DEBUG: Claves disponibles en prompts_motivaciones: {list(prompts_motivaciones.keys())}")
+        
         # Verificar si el paquete ya fue generado
-        if paquete in ['preceptivas', 'tecnicas', 'facultativas', 'progresistas']:
+        if paquete in prompts_motivaciones:
             if analisis['por_que'][paquete]:
+                print(f"📦 Paquete '{paquete}' ya generado (cache)")
                 return jsonify({
                     'success': True,
                     'paquete': paquete,
@@ -105,26 +134,53 @@ def obtener_paquete(informe_id, paquete):
                 })
             
             # Generar el paquete específico
-            from agentes.formal_causal_agent import get_llm, safe_llm_call
-            from agentes.formal_causal_agent import (
-                PROMPT_PRECEPTIVAS, PROMPT_TECNICAS, 
-                PROMPT_FACULTATIVAS, PROMPT_PROGRESISTAS
-            )
+            print(f"🔍 Analizando motivaciones {paquete.upper()}...")
             
             llm = get_llm()
-            prompts = {
-                'preceptivas': PROMPT_PRECEPTIVAS,
-                'tecnicas': PROMPT_TECNICAS,
-                'facultativas': PROMPT_FACULTATIVAS,
-                'progresistas': PROMPT_PROGRESISTAS
-            }
+            prompt_template = prompts_motivaciones[paquete]
             
-            prompt = prompts[paquete].format(conjetura=conjetura)
-            result = safe_llm_call(llm, prompt, {paquete: []})
-            motivaciones = result.get(paquete, [])
+            # Formatear el prompt según el paquete
+            print(f"DEBUG: Formateando prompt para paquete='{paquete}'")
+            if paquete == 'preceptivas':
+                print(f"DEBUG: Caso preceptivas")
+                prompt = prompt_template.format(conjetura=conjetura)
+            elif paquete == 'tecnicas':
+                print(f"DEBUG: Caso tecnicas")
+                preceptivas_str = json.dumps(analisis['por_que']['preceptivas'], indent=2, ensure_ascii=False)
+                prompt = prompt_template.format(conjetura=conjetura, preceptivas=preceptivas_str)
+            elif paquete == 'facultativas':
+                preceptivas_str = json.dumps(analisis['por_que']['preceptivas'], indent=2, ensure_ascii=False)
+                tecnicas_str = json.dumps(analisis['por_que']['tecnicas'], indent=2, ensure_ascii=False)
+                prompt = prompt_template.format(conjetura=conjetura, preceptivas=preceptivas_str, tecnicas=tecnicas_str)
+            elif paquete == 'progresistas':
+                preceptivas_str = json.dumps(analisis['por_que']['preceptivas'], indent=2, ensure_ascii=False)
+                tecnicas_str = json.dumps(analisis['por_que']['tecnicas'], indent=2, ensure_ascii=False)
+                facultativas_str = json.dumps(analisis['por_que']['facultativas'], indent=2, ensure_ascii=False)
+                prompt = prompt_template.format(
+                    conjetura=conjetura,
+                    preceptivas=preceptivas_str,
+                    tecnicas=tecnicas_str,
+                    facultativas=facultativas_str
+                )
+            
+            # Crear un default específico para este paquete
+            result = safe_llm_call(llm, prompt, None)
+            
+            # Si el resultado es None o no es dict, usar array vacío
+            if result is None or not isinstance(result, dict):
+                print(f"⚠️ LLM no devolvió resultado válido para {paquete}")
+                motivaciones = []
+            elif paquete in result:
+                motivaciones = result[paquete]
+            else:
+                print(f"⚠️ La clave '{paquete}' no está en el resultado del LLM. Claves disponibles: {list(result.keys())}")
+                motivaciones = []
             
             # Guardar en memoria
             analisis['por_que'][paquete] = motivaciones
+            
+            num_motivaciones = len(motivaciones)
+            print(f"✅ Encontradas {num_motivaciones} motivaciones {paquete}")
             
             return jsonify({
                 'success': True,
@@ -135,6 +191,7 @@ def obtener_paquete(informe_id, paquete):
             
         elif paquete == 'objetivos':
             if analisis['para_que']:
+                print(f"📦 Objetivos ya generados (cache)")
                 return jsonify({
                     'success': True,
                     'paquete': 'objetivos',
@@ -143,8 +200,7 @@ def obtener_paquete(informe_id, paquete):
                 })
             
             # Generar objetivos
-            from agentes.formal_causal_agent import get_llm, safe_llm_call, PROMPT_OBJETIVOS
-            import json
+            print(f"🔍 Analizando OBJETIVOS (¿Para qué?)...")
             
             llm = get_llm()
             preceptivas_str = json.dumps(analisis['por_que']['preceptivas'], indent=2, ensure_ascii=False)
@@ -164,6 +220,9 @@ def obtener_paquete(informe_id, paquete):
             objetivos = result.get('para_que', [])
             analisis['para_que'] = objetivos
             
+            num_objetivos = len(objetivos)
+            print(f"✅ Encontrados {num_objetivos} objetivos")
+            
             return jsonify({
                 'success': True,
                 'paquete': 'objetivos',
@@ -173,6 +232,7 @@ def obtener_paquete(informe_id, paquete):
             
         elif paquete == 'que_es':
             if analisis['que_es']:
+                print(f"📦 Definición 'Qué es' ya generada (cache)")
                 return jsonify({
                     'success': True,
                     'paquete': 'que_es',
@@ -181,8 +241,7 @@ def obtener_paquete(informe_id, paquete):
                 })
             
             # Generar qué es
-            from agentes.formal_causal_agent import get_llm, safe_llm_call, PROMPT_QUE_ES
-            import json
+            print(f"🔍 Definiendo QUÉ ES el problema...")
             
             llm = get_llm()
             preceptivas_str = json.dumps(analisis['por_que']['preceptivas'], indent=2, ensure_ascii=False)
@@ -204,6 +263,8 @@ def obtener_paquete(informe_id, paquete):
             definicion = result.get('que_es', {})
             analisis['que_es'] = definicion
             
+            print(f"✅ Definición completada")
+            
             return jsonify({
                 'success': True,
                 'paquete': 'que_es',
@@ -217,7 +278,9 @@ def obtener_paquete(informe_id, paquete):
         }), 400
         
     except Exception as e:
-        print(f"Error al obtener paquete {paquete}: {e}")
+        print(f"❌ Error al obtener paquete {paquete}: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({
             'success': False,
             'message': f'Error: {str(e)}'
@@ -255,12 +318,14 @@ def guardar_motivacion():
         analisis = informes_generados[informe_id]['analisis']
         analisis['por_que'][paquete][indice] = motivacion
         
+        print(f"💾 Motivación guardada: {paquete}[{indice}] - {motivacion['titulo'][:50]}")
+        
         return jsonify({
             'success': True,
             'message': 'Motivación guardada correctamente'
         })
     except Exception as e:
-        print(f"Error al guardar motivación: {e}")
+        print(f"❌ Error al guardar motivación: {e}")
         return jsonify({
             'success': False,
             'message': f'Error al guardar: {str(e)}'
@@ -281,6 +346,10 @@ def generar_informe_final():
     try:
         datos = informes_generados[informe_id]
         
+        print(f"\n{'='*60}")
+        print(f"📄 GENERANDO INFORME FINAL")
+        print(f"{'='*60}\n")
+        
         # Generar el informe completo con las motivaciones revisadas
         informe_data = generar_informe_con_ia(datos['conjetura'], datos['analisis'])
         
@@ -288,12 +357,16 @@ def generar_informe_final():
         informes_generados[informe_id] = informe_data
         informes_generados[informe_id]['informe_generado'] = True
         
+        print(f"✅ Informe generado correctamente\n")
+        
         return jsonify({
             'success': True,
             'message': 'Informe generado correctamente'
         })
     except Exception as e:
-        print(f"Error al generar informe final: {e}")
+        print(f"❌ Error al generar informe final: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({
             'success': False,
             'message': f'Error al generar informe: {str(e)}'
